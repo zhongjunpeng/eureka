@@ -375,7 +375,9 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
     @Override
     public boolean cancel(final String appName, final String id,
                           final boolean isReplication) {
+        //调用父类 AbstractInstanceRegistry#cancel(...) 方法，下线应用实例信息。
         if (super.cancel(appName, id, isReplication)) {
+            // Eureka-Server 向集群同步下线消息
             replicateToPeers(Action.Cancel, appName, id, null, null, isReplication);
 
             return true;
@@ -396,11 +398,15 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
      */
     @Override
     public void register(final InstanceInfo info, final boolean isReplication) {
+        // 租约过期时间/服务时效间隔，如果客户端配置了，就取客户端的
         int leaseDuration = Lease.DEFAULT_DURATION_IN_SECS;
         if (info.getLeaseInfo() != null && info.getLeaseInfo().getDurationInSecs() > 0) {
+            //取客户端的
             leaseDuration = info.getLeaseInfo().getDurationInSecs();
         }
+        // 调用父类 AbstractInstanceRegistry#register(...) 方法进行注册
         super.register(info, leaseDuration, isReplication);
+        // 当前server把注册实例信息同步到其他的对等的sever节点
         replicateToPeers(Action.Register, info.getAppName(), info.getId(), info, null, isReplication);
     }
 
@@ -411,6 +417,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
      * java.lang.String, long, boolean)
      */
     public boolean renew(final String appName, final String id, final boolean isReplication) {
+        // 调用父类 AbstractInstanceRegistry#renew(...) 方法，注册应用实例信息。
         if (super.renew(appName, id, isReplication)) {
             replicateToPeers(Action.Heartbeat, appName, id, null, null, isReplication);
             return true;

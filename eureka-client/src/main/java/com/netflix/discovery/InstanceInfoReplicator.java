@@ -29,15 +29,28 @@ class InstanceInfoReplicator implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(InstanceInfoReplicator.class);
 
     private final DiscoveryClient discoveryClient;
+    /**
+     * 应用实例信息
+     */
     private final InstanceInfo instanceInfo;
-
+    /**
+     * 定时执行频率，单位：秒
+     */
     private final int replicationIntervalSeconds;
     private final ScheduledExecutorService scheduler;
     private final AtomicReference<Future> scheduledPeriodicRef;
-
+    /**
+     * 是否开启调度
+     */
     private final AtomicBoolean started;
     private final RateLimiter rateLimiter;
+    /**
+     * 令牌桶上限，默认：2
+     */
     private final int burstSize;
+    /**
+     * 令牌再装平均速率，默认：60 * 2 / 30 = 4
+     */
     private final int allowedRatePerMinute;
 
     InstanceInfoReplicator(DiscoveryClient discoveryClient, InstanceInfo instanceInfo, int replicationIntervalSeconds, int burstSize) {
@@ -62,7 +75,12 @@ class InstanceInfoReplicator implements Runnable {
 
     public void start(int initialDelayMs) {
         if (started.compareAndSet(false, true)) {
+            // 设置 应用实例信息 数据不一致
+            // 因为 InstanceInfo 刚被创建时，在 Eureka-Server 不存在，也会被注册。
             instanceInfo.setIsDirty();  // for initial register
+            // 提交任务，并设置该任务的 Future
+            // 为什么要延迟 initialDelayMs 毫秒执行一次任务
+            // 在 InstanceInfoReplicator#onDemandUpdate() 方法会看到具体用途
             Future next = scheduler.schedule(this, initialDelayMs, TimeUnit.SECONDS);
             scheduledPeriodicRef.set(next);
         }
@@ -114,11 +132,15 @@ class InstanceInfoReplicator implements Runnable {
 
     public void run() {
         try {
+            // 刷新 应用实例信息
             discoveryClient.refreshInstanceInfo();
 
+            // 判断 应用实例信息 是否数据不一致
             Long dirtyTimestamp = instanceInfo.isDirtyWithTime();
             if (dirtyTimestamp != null) {
+                // 发起注册 ，Eureka-Client 向 Eureka-Server 注册应用实例
                 discoveryClient.register();
+                // 设置 应用实例信息 数据一致
                 instanceInfo.unsetIsDirty(dirtyTimestamp);
             }
         } catch (Throwable t) {

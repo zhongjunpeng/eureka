@@ -108,6 +108,12 @@ public interface EurekaServerConfig {
      * <em>The changes are effective at runtime.</em>
      * </p>
      *
+     * 是否开启自我保护模式。
+     * FROM 周立——《理解Eureka的自我保护模式》
+     * 当Eureka Server节点在短时间内丢失过多客户端时（可能发生了网络分区故障），那么这个节点就会进入自我保护模式。
+     * 一旦进入该模式，Eureka Server就会保护服务注册表中的信息，不再删除服务注册表中的数据（也就是不会注销任何微服务）。
+     * 当网络故障恢复后，该Eureka Server节点会自动退出自我保护模式。
+     *
      * @return true to enable self preservation, false otherwise.
      */
     boolean shouldEnableSelfPreservation();
@@ -122,6 +128,8 @@ public interface EurekaServerConfig {
      * <em>The changes are effective at runtime.</em>
      * </p>
      *
+     * 开启自我保护模式比例，超过该比例后开启自我保护模式，默认是85%
+     *
      * @return value between 0 and 1 indicating the percentage. For example,
      *         <code>85%</code> will be specified as <code>0.85</code>.
      */
@@ -130,6 +138,8 @@ public interface EurekaServerConfig {
     /**
      * The interval with which the threshold as specified in
      * {@link #getRenewalPercentThreshold()} needs to be updated.
+     *
+     * 自我保护模式比例更新频率，单位：毫秒
      *
      * @return time in milliseconds indicating the interval.
      */
@@ -315,6 +325,10 @@ public interface EurekaServerConfig {
      * The {@link com.netflix.eureka.registry.ResponseCache} currently uses a two level caching
      * strategy to responses. A readWrite cache with an expiration policy, and a readonly cache
      * that caches without expiry.
+     *
+     * 否开启只读请求响应缓存。
+     * 响应缓存 ( ResponseCache ) 机制目前使用两层缓存策略。
+     * 优先读取永不过期的只读缓存，读取不到后读取固定过期的读写缓存。
      *
      * @return true if the read only cache is to be used
      */

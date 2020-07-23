@@ -32,10 +32,15 @@ import com.netflix.eureka.registry.AbstractInstanceRegistry;
  */
 public class Lease<T> {
 
+    // 操作
     enum Action {
+        // 注册、取消、续约
         Register, Cancel, Renew
     };
 
+    /**
+     * 默认租约持续时长，单位：秒
+     */
     public static final int DEFAULT_DURATION_IN_SECS = 90;
 
     private T holder;

@@ -110,7 +110,9 @@ public class EurekaBootStrap implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         try {
+            // 初始化环境信息
             initEurekaEnvironment();
+            // 初始化上下文信息
             initEurekaServerContext();
 
             ServletContext sc = event.getServletContext();
@@ -157,6 +159,7 @@ public class EurekaBootStrap implements ServletContextListener {
 
         ApplicationInfoManager applicationInfoManager = null;
 
+        // 初始化eureka-server内部的一个eureka-client（用来跟eureka-server 集群内其他节点做注册和通信）
         if (eurekaClient == null) {
             EurekaInstanceConfig instanceConfig = isCloud(ConfigurationManager.getDeploymentContext())
                     ? new CloudInstanceConfig()
@@ -198,6 +201,7 @@ public class EurekaBootStrap implements ServletContextListener {
                 applicationInfoManager
         );
 
+        // 创建 Eureka-Server 上下文，提供Eureka-Server 内部各组件对象的初始化、关闭、获取等方法。
         serverContext = new DefaultEurekaServerContext(
                 eurekaServerConfig,
                 serverCodecs,
@@ -206,15 +210,21 @@ public class EurekaBootStrap implements ServletContextListener {
                 applicationInfoManager
         );
 
+        // 为非ioc容器提供获取serverContext对象的接口
         EurekaServerContextHolder.initialize(serverContext);
 
+        // 初始化 Eureka-Server 上下文
         serverContext.initialize();
         logger.info("Initialized server context");
 
+        // 当某一个server实例启动的时候，从集群中其他的server拷贝注册信息进行同步，
+        // 因为每一个server对于其他的server来说都是一个client
         // Copy registry from neighboring eureka node
         int registryCount = registry.syncUp();
+        //更改实例状态为 up 并对外提供服务。
         registry.openForTraffic(applicationInfoManager, registryCount);
 
+        // 注册统计器
         // Register all monitoring statistics.
         EurekaMonitors.registerAllStats();
     }

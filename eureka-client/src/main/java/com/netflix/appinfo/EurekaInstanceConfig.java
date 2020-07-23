@@ -108,6 +108,10 @@ public interface EurekaInstanceConfig {
     boolean getSecurePortEnabled();
 
     /**
+     * 租约续约频率，单位：秒。应用不断通过按照该频率发送心跳给Eureka-Server以达到续约的作用。
+     * 当Eureka-Server超过最大时间未收到续约（心跳），此时，将客户端移除，其他应用无法从
+     * Eureka-Server获取该应用。
+     *
      * Indicates how often (in seconds) the eureka client needs to send
      * heartbeats to eureka server to indicate that it is still alive. If the
      * heartbeats are not received for the period specified in
@@ -140,6 +144,7 @@ public interface EurekaInstanceConfig {
      *
      * @return value indicating time in seconds.
      */
+    //契约过期时间，单位：秒
     int getLeaseExpirationDurationInSeconds();
 
     /**
@@ -368,6 +373,13 @@ public interface EurekaInstanceConfig {
     String[] getDefaultAddressResolutionOrder();
 
     /**
+     * 配置命名空间，默认使用 eureka
+     * 每个属性最前面的 eureka 即是配置命名空间，一般情况无需修改。
+     * eg:
+     * eureka.name=eureka
+     * eureka.port=8080
+     * eureka.vipAddress=eureka.mydomain.net
+     *
      * Get the namespace used to find properties.
      * @return the namespace used to find properties.
      */
