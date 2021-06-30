@@ -10,8 +10,8 @@ package com.netflix.eureka.util.batcher;
  * the actual work of task processing. This implementation must be thread safe, as it is called concurrently by
  * multiple threads.
  * <h3>Execution modes</h3>
- * To create non batched executor call {@link TaskDispatchers#createNonBatchingTaskDispatcher(String, int, int, long, long, TaskProcessor)}
- * method. Batched executor is created by {@link TaskDispatchers#createBatchingTaskDispatcher(String, int, int, int, long, long, TaskProcessor)}.
+ * To create non batched executor call {@link TaskDispatchers# createNonBatchingTaskDispatcher(String, int, int, long, long, TaskProcessor)}
+ * method. Batched executor is created by {@link TaskDispatchers# createBatchingTaskDispatcher(String, int, int, int, long, long, TaskProcessor)}.
  *
  * @author Tomasz Bak
  */

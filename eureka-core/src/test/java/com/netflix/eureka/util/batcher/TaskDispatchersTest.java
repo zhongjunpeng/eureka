@@ -23,9 +23,12 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import com.netflix.eureka.DefaultEurekaServerConfig;
 import com.netflix.eureka.util.batcher.TaskProcessor.ProcessingResult;
 import org.junit.After;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -47,6 +50,9 @@ public class TaskDispatchersTest {
     private final RecordingProcessor processor = new RecordingProcessor();
 
     private TaskDispatcher<Integer, ProcessingResult> dispatcher;
+
+    private static final Logger logger = LoggerFactory
+            .getLogger(TaskDispatchersTest.class);
 
     @After
     public void tearDown() throws Exception {
@@ -125,7 +131,9 @@ public class TaskDispatchersTest {
                     fail("Uneven load distribution");
                 }
             }
-        } finally {
+        } catch (Exception e){
+            logger.error("错误[{}]",e.getMessage());
+        }  finally{
             dispatcher.shutdown();
         }
     }

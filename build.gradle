@@ -1,7 +1,13 @@
 buildscript {
-    repositories { jcenter() }
+    repositories {
+        maven {
+            url 'http://maven.aliyun.com/nexus/content/groups/public/'
+        }
+        mavenCentral()
+    }
 
     dependencies {
+        classpath 'org.projectlombok:lombok:1.18.2'
         classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
     }
 }
@@ -21,6 +27,7 @@ if (JavaVersion.current().isJava8Compatible()) {
     allprojects {
         tasks.withType(Javadoc) {
             options.addStringOption('Xdoclint:none', '-quiet')
+            options.encoding("UTF-8")
         }
     }
 }
@@ -61,7 +68,11 @@ subprojects {
     targetCompatibility = 1.8
 
     repositories {
-        jcenter()
+        //jcenter()
+        maven {
+            url 'http://maven.aliyun.com/nexus/content/groups/public/'
+        }
+        mavenCentral()
     }
 
     test {
