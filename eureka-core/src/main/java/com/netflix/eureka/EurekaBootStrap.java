@@ -148,6 +148,7 @@ public class EurekaBootStrap implements ServletContextListener {
      * init hook for server context. Override for custom logic.
      */
     protected void initEurekaServerContext() throws Exception {
+        // 创建 eurekaServerConfig 对象，用来加载 eureka-server.properties 文件中的配置信息
         EurekaServerConfig eurekaServerConfig = new DefaultEurekaServerConfig();
 
         // For backward compatibility
@@ -175,6 +176,7 @@ public class EurekaBootStrap implements ServletContextListener {
             applicationInfoManager = eurekaClient.getApplicationInfoManager();
         }
 
+        // 处理注册相关的事情
         PeerAwareInstanceRegistry registry;
         if (isAws(applicationInfoManager.getInfo())) {
             registry = new AwsInstanceRegistry(
@@ -194,6 +196,7 @@ public class EurekaBootStrap implements ServletContextListener {
             );
         }
 
+        // 处理peer节点
         PeerEurekaNodes peerEurekaNodes = getPeerEurekaNodes(
                 registry,
                 eurekaServerConfig,
@@ -218,7 +221,7 @@ public class EurekaBootStrap implements ServletContextListener {
         serverContext.initialize();
         logger.info("Initialized server context");
 
-        // 当某一个server实例启动的时候，从集群中其他的server拷贝注册信息进行同步，
+        // 当某一个server实例启动的时候，从集群中其他相邻的server节点拷贝注册信息进行同步，
         // 因为每一个server对于其他的server来说都是一个client
         // Copy registry from neighboring eureka node
         int registryCount = registry.syncUp();

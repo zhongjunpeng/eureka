@@ -25,13 +25,16 @@ import com.netflix.eureka.aws.AwsBindingStrategy;
 
 /**
  * Configuration information required by the eureka server to operate.
+ * eureka server 运行所需的配置信息
  *
  * <p>
  * Most of the required information is provided by the default configuration
  * {@link com.netflix.eureka.DefaultEurekaServerConfig}.
+ * 大多数所需要的信息都是由默认配置类提供的 com.netflix.eureka.DefaultEurekaServerConfig
  *
  * Note that all configurations are not effective at runtime unless and
  * otherwise specified.
+ * 注意，所有的配置类在运行时期都不生效，除非另有说明
  * </p>
  *
  * @author Karthik Ranganathan
@@ -96,6 +99,7 @@ public interface EurekaServerConfig {
 
     /**
      * Checks to see if the eureka server is enabled for self preservation.
+     * 检查eureka服务器是否已启用自我保护。
      *
      * <p>
      * When enabled, the server keeps track of the number of <em>renewals</em>
@@ -104,6 +108,11 @@ public interface EurekaServerConfig {
      * {@link #getRenewalPercentThreshold()}, the server turns off expirations
      * to avert danger.This will help the server in maintaining the registry
      * information in case of network problems between client and the server.
+     *
+     * 当这个配置启用时，server 会追踪收到客户端发送的续约心跳次数。如果在任意时刻，client 发送的续约心跳次数
+     * 少于 #getRenewalPercentThreshold() 这个方法定义的阈值也就是这个百分比时，server 会停止过期服务以避免风险。
+     * 这样会在eureka server 和client 出现网络问题时，不会删除服务注册表的信息。
+     *
      * <p>
      * <em>The changes are effective at runtime.</em>
      * </p>
@@ -111,7 +120,7 @@ public interface EurekaServerConfig {
      * 是否开启自我保护模式。
      * FROM 周立——《理解Eureka的自我保护模式》
      * 当Eureka Server节点在短时间内丢失过多客户端时（可能发生了网络分区故障），那么这个节点就会进入自我保护模式。
-     * 一旦进入该模式，Eureka Server就会保护服务注册表中的信息，不再删除服务注册表中的数据（也就是不会注销任何微服务）。
+     * 一旦进入该模式，Eureka Server就会保护服务注册表中的信息，不再删除服务注册表中的数据（也就是不会注销任何服务节点）。
      * 当网络故障恢复后，该Eureka Server节点会自动退出自我保护模式。
      *
      * @return true to enable self preservation, false otherwise.
@@ -124,11 +133,13 @@ public interface EurekaServerConfig {
      * If the renewals drop below the threshold, the expirations are disabled if
      * the {@link #shouldEnableSelfPreservation()} is enabled.
      *
+     * 通过 getRenewalThresholdUpdateIntervalMs 方法在指定的一段时间内，期望的续约次数的最小百分比。
+     * 如果续约百分比低于阈值，那么 shouldEnableSelfPreservation 这个方法就会生效，而这个服务过期设置就会失效。
      * <p>
      * <em>The changes are effective at runtime.</em>
      * </p>
      *
-     * 开启自我保护模式比例，超过该比例后开启自我保护模式，默认是85%
+     * 开启自我保护模式比例，超过低于该比例后开启自我保护模式，默认是85%
      *
      * @return value between 0 and 1 indicating the percentage. For example,
      *         <code>85%</code> will be specified as <code>0.85</code>.
@@ -138,6 +149,8 @@ public interface EurekaServerConfig {
     /**
      * The interval with which the threshold as specified in
      * {@link #getRenewalPercentThreshold()} needs to be updated.
+     *
+     * getRenewalPercentThreshold 方法中获取自我保护模式比例的更新周期
      *
      * 自我保护模式比例更新频率，单位：毫秒
      *
@@ -151,7 +164,10 @@ public interface EurekaServerConfig {
      * this parameter should be tuned accordingly, otherwise, self-preservation won't work as
      * expected.
      *
-     * @return time in seconds indicating the expected interval
+     * client 端发送心跳的周期，默认是 30 秒。如果 client 端需要不同周期去发送心跳，例如每 15 秒 发送一次，
+     * 则需要调整此参数，否则，自我保护模式就无法按照预期去执行。
+     *
+     * @return time in seconds indicating the expected interval (表示预期间隔的时间（以秒为单位）)
      */
     int getExpectedClientRenewalIntervalSeconds();
 
