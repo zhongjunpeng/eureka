@@ -63,11 +63,14 @@ import javax.inject.Singleton;
 /**
  * Handles replication of all operations to {@link AbstractInstanceRegistry} to peer
  * <em>Eureka</em> nodes to keep them all in sync.
+ * 处理将所有操作复制到{@link AbstractInstanceRegistry}到同等Eureka节点，使它们保持同步
  *
  * <p>
  * Primary operations that are replicated are the
  * <em>Registers,Renewals,Cancels,Expirations and Status Changes</em>
  * </p>
+ *
+ * 复制的主要操作是注册、续订、取消、过期和状态更改
  *
  * <p>
  * When the eureka server starts up it tries to fetch all the registry
@@ -77,6 +80,10 @@ import javax.inject.Singleton;
  * {@link com.netflix.eureka.EurekaServerConfig#getWaitTimeInMsWhenSyncEmpty()}.
  * </p>
  *
+ * 当 eureka server 启动时，server 会试着从同等的 eureka server 节点去获取所有注册表信息。
+ * 如果由于某些原因获取失败，server将会在 getWaitTimeInMsWhenSyncEmpty() 方法指定的之间内，
+ * 不允许用户再次操作去获取注册表信息。
+ *
  * <p>
  * One important thing to note about <em>renewals</em>.If the renewal drops more
  * than the specified threshold as specified in
@@ -84,6 +91,10 @@ import javax.inject.Singleton;
  * {@link com.netflix.eureka.EurekaServerConfig#getRenewalThresholdUpdateIntervalMs()}, eureka
  * perceives this as a danger and stops expiring instances.
  * </p>
+ *
+ * 对于续约有一件重要的事情需要注意，如果在 getRenewalThresholdUpdateIntervalMs() 方法指定的一段时间内，
+ * 续约节点数量下降的幅度超过 getRenewalPercentThreshold() 方法中指定的阈值，也就是说在指定的时间内，有百分比数量的节点没有续约，
+ * eureka会将此视为一种危险，并停止使实例过期，也就是说会进入自我保护机制，不会过期服务节点。
  *
  * @author Karthik Ranganathan, Greg Kim
  *
@@ -131,6 +142,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
             ServerCodecs serverCodecs,
             EurekaClient eurekaClient
     ) {
+        // 调用父类 AbstractInstanceRegistry
         super(serverConfig, clientConfig, serverCodecs);
         this.eurekaClient = eurekaClient;
         this.numberOfReplicationsLastMin = new MeasuredRate(1000 * 60 * 1);

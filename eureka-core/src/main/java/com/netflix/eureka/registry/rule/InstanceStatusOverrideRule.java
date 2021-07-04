@@ -9,7 +9,7 @@ import com.netflix.eureka.registry.AbstractInstanceRegistry;
  * The idea is to use an ordered list of such rules and pick the first result that matches.
  *
  * It is designed to be used by
- * {@link AbstractInstanceRegistry#getOverriddenInstanceStatus(InstanceInfo, Lease, boolean)}
+ * {@link AbstractInstanceRegistry #getOverriddenInstanceStatus(InstanceInfo, Lease, boolean)}
  *
  * Created by Nikos Michalakis on 7/13/16.
  */

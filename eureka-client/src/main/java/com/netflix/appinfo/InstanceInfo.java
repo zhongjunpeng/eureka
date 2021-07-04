@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The class that holds information required for registration with
  * <tt>Eureka Server</tt> and to be discovered by other components.
+ * 保存在Eureka server上注册所需的信息并由其他组件发现的类
  * <p>
  * <code>@Auto</code> annotated fields are serialized as is; Other fields are
  * serialized as specified by the <code>@Serializer</code>.
@@ -155,6 +156,7 @@ public class InstanceInfo {
     private volatile String asgName;
     private String version = VERSION_UNKNOWN;
 
+    // 私有无参构造器，使用建造者模式时一般会把无参构造器私有化，那外部就只能按照要求创建对应对象了
     private InstanceInfo() {
         this.metadata = new ConcurrentHashMap<String, String>();
         this.lastUpdatedTimestamp = System.currentTimeMillis();
@@ -368,6 +370,8 @@ public class InstanceInfo {
         SECURE, UNSECURE
     }
 
+    // 建造者模式，builder模式
+    // 校验逻辑放到这里来做，包括必填项校验、依赖关系校验、约束条件校验等
     public static final class Builder {
         private static final String COLON = ":";
         private static final String HTTPS_PROTOCOL = "https://";

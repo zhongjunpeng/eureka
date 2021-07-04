@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
  * InstanceInfo provider that constructs the InstanceInfo this this instance using
  * EurekaInstanceConfig.
  *
+ *
  * This provider is @Singleton scope as it provides the InstanceInfo for both DiscoveryClient
  * and ApplicationInfoManager, and need to provide the same InstanceInfo to both.
  *
@@ -47,14 +48,18 @@ public class EurekaConfigBasedInstanceInfoProvider implements Provider<InstanceI
         if (instanceInfo == null) {
             // Build the lease information to be passed to the server based on config
             LeaseInfo.Builder leaseInfoBuilder = LeaseInfo.Builder.newBuilder()
-                    .setRenewalIntervalInSecs(config.getLeaseRenewalIntervalInSeconds())
-                    .setDurationInSecs(config.getLeaseExpirationDurationInSeconds());
+                    .setRenewalIntervalInSecs(config.getLeaseRenewalIntervalInSeconds()) // 续约周期 30s
+                    .setDurationInSecs(config.getLeaseExpirationDurationInSeconds()); // 续约有效期 90s
 
             if (vipAddressResolver == null) {
                 vipAddressResolver = new Archaius1VipAddressResolver();
             }
 
+            // 通过构造器模式来创建实例信息对象用于到eureka server 注册
             // Builder the instance information to be registered with eureka server
+            /**
+             * 为什么要用构造器模式呢？直接用 new InstanceInfo() 创建对象然后将属性值 set 进去不就行了么？
+             */
             InstanceInfo.Builder builder = InstanceInfo.Builder.newBuilder(vipAddressResolver);
 
             // set the appropriate id for the InstanceInfo, falling back to datacenter Id if applicable, else hostname

@@ -23,6 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 /**
  * Represents the <em>lease</em> information with <em>Eureka</em>.
+ * 代表 Eureka 的契约信息
  *
  * <p>
  * <em>Eureka</em> decides to remove the instance out of its view depending on
@@ -30,6 +31,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
  * {@link EurekaInstanceConfig#getLeaseExpirationDurationInSeconds()} which is
  * held in this lease. The lease also tracks the last time it was renewed.
  * </p>
+ * Eureka 决定移除这个实例取决于 在 getLeaseExpirationDurationInSeconds() 设置的值，这个契约依然保留着上次续约的时间
  *
  * @author Karthik Ranganathan, Greg Kim
  *
@@ -37,7 +39,9 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 @JsonRootName("leaseInfo")
 public class LeaseInfo {
 
+    // 默认心跳续约的周期是 30 秒
     public static final int DEFAULT_LEASE_RENEWAL_INTERVAL = 30;
+    // 默认维持续约的时间是 90 秒
     public static final int DEFAULT_LEASE_DURATION = 90;
 
     // Client settings
@@ -65,6 +69,7 @@ public class LeaseInfo {
 
         /**
          * Sets the registration timestamp.
+         * 设置注册时的时间戳
          *
          * @param ts
          *            time when the lease was first registered.
@@ -77,6 +82,7 @@ public class LeaseInfo {
 
         /**
          * Sets the last renewal timestamp of lease.
+         * 记录最后一次续约的时间
          *
          * @param ts
          *            time when the lease was last renewed.
@@ -89,6 +95,7 @@ public class LeaseInfo {
 
         /**
          * Sets the de-registration timestamp.
+         * 记录被移除的时间戳
          *
          * @param ts
          *            time when the lease was removed.
@@ -101,6 +108,7 @@ public class LeaseInfo {
 
         /**
          * Sets the service UP timestamp.
+         * 记录服务上线的时间戳
          *
          * @param ts
          *            time when the leased service marked as UP.
@@ -114,10 +122,12 @@ public class LeaseInfo {
         /**
          * Sets the client specified setting for eviction (e.g. how long to wait
          * without renewal event).
+         * 记录 client 端指定多久时间会被剔除，也就是等待多长时间没有续约
          *
          * @param d
          *            time in seconds after which the lease would expire without
          *            renewa.
+         *            用秒来表示多久没有续约，这个契约就会过期了
          * @return the {@link LeaseInfo} builder.
          */
         public Builder setDurationInSecs(int d) {
@@ -131,7 +141,7 @@ public class LeaseInfo {
 
         /**
          * Sets the client specified setting for renew interval.
-         *
+         * 设置 client 端指定的续约周期
          * @param i
          *            the time interval with which the renewals will be renewed.
          * @return the {@link LeaseInfo} builder.
@@ -190,6 +200,7 @@ public class LeaseInfo {
 
     /**
      * Returns the registration timestamp.
+     * 返回注册时间戳
      *
      * @return time in milliseconds since epoch.
      */

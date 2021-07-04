@@ -130,6 +130,8 @@ public class Applications {
     /**
      * Gets the list of all registered <em>applications</em> from eureka.
      *
+     * 从 eureka 中获取所有注册应用
+     *
      * @return list containing all applications registered with eureka.
      */
     @JsonProperty("application")

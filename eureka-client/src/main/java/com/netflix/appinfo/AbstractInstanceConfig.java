@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
  * An abstract instance info configuration with some defaults to get the users
  * started quickly.The users have to override only a few methods to register
  * their instance with eureka server.
+ * 一个抽象的实例信息配置，带有一些默认值，可以让用户快速启动。用户只需重写几个方法就可以在eureka服务器上注册实例。
  *
  * @author Karthik Ranganathan
  *

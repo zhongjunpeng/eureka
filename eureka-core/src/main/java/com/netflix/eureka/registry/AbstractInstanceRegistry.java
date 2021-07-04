@@ -63,12 +63,15 @@ import static com.netflix.eureka.util.EurekaMonitors.*;
 
 /**
  * Handles all registry requests from eureka clients.
+ * 处理来自eureka client 的所有注册表请求。
  *
  * <p>
  * Primary operations that are performed are the
  * <em>Registers</em>, <em>Renewals</em>, <em>Cancels</em>, <em>Expirations</em>, and <em>Status Changes</em>. The
  * registry also stores only the delta operations
  * </p>
+ *
+ * 执行的主要操作是 注册、续约、取消、过期和状态变更。注册表也只存储增量操作
  *
  * @author Karthik Ranganathan
  *
@@ -124,9 +127,11 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
 
         this.renewsLastMin = new MeasuredRate(1000 * 60 * 1);
 
+        // getDeltaRetentionTask():// 定时清理最近修改的记录队列的任务
+        // 30s执行一次，把增量存在时间大于180s的数据给清理掉。
         this.deltaRetentionTimer.schedule(getDeltaRetentionTask(),
-                serverConfig.getDeltaRetentionTimerIntervalInMs(),
-                serverConfig.getDeltaRetentionTimerIntervalInMs());
+                serverConfig.getDeltaRetentionTimerIntervalInMs(), // 30s
+                serverConfig.getDeltaRetentionTimerIntervalInMs());// 30s 执行一次
     }
 
     @Override

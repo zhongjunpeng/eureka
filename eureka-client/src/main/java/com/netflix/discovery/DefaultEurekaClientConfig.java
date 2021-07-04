@@ -37,6 +37,7 @@ import static com.netflix.discovery.PropertyBasedClientConfigConstants.*;
  *
  * A default implementation of eureka client configuration as required by
  * {@link EurekaClientConfig}.
+ * eureka client 的 EurekaClientConfig 配置类的默认实现类
  *
  * <p>
  * The information required for configuring eureka client is provided in a
@@ -46,6 +47,9 @@ import static com.netflix.discovery.PropertyBasedClientConfigConstants.*;
  * <em>eureka-client.properties</em> is assumed as the default.The properties
  * that are looked up uses the <em>namespace</em> passed on to this class.
  * </p>
+ * 配置 eureka client 所需的信息在配置文件中提供，这个配置文件可以在类路径中通过由属性
+ * eureka.client.props 来指定名称，后缀为 .properties 来搜索到。如果 eureka.client.props 属性没有指定的话，
+ * 那么 eureka-client.properties 文件就作为默认的配置文件
  *
  * <p>
  * If the <em>eureka.environment</em> property is specified, additionally

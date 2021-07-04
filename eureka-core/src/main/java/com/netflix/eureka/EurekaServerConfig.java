@@ -176,6 +176,8 @@ public interface EurekaServerConfig {
      * nodes is updated. The user can use the DNS mechanism or dynamic
      * configuration provided by <a href="https://github.com/Netflix/archaius">Archaius</a> to
      * change the information dynamically.
+     *
+     * 更新对等eureka节点中的更改信息的间隔
      * <p>
      * <em>The changes are effective at runtime.</em>
      * </p>
@@ -187,6 +189,8 @@ public interface EurekaServerConfig {
     /**
      * If set to true, the replicated data send in the request will be always compressed.
      * This does not define response path, which is driven by "Accept-Encoding" header.
+     *
+     * 如果设置为true，则请求中发送的复制数据将始终被压缩
      */
     boolean shouldEnableReplicatedRequestCompression();
 
@@ -197,6 +201,8 @@ public interface EurekaServerConfig {
      * <em>The changes are effective at runtime.</em>
      * </p>
      *
+     * 获取应与对等方重试复制事件的次数。
+     *
      * @return the number of retries.
      */
     int getNumberOfReplicationRetries();
@@ -204,6 +210,8 @@ public interface EurekaServerConfig {
     /**
      * Gets the interval with which the status information about peer nodes is
      * updated.
+     *
+     * 获取更新对等节点状态信息的间隔
      * <p>
      * <em>The changes are effective at runtime.</em>
      * </p>
@@ -218,9 +226,14 @@ public interface EurekaServerConfig {
      * during these scenarios as the information that is stored in the registry
      * may not be complete.
      *
+     * 获取eureka服务器启动时无法从对等节点获取实例时等待的时间。
+     * 最好不要在这些场景中立即开始服务，因为存储在注册表中的信息可能不完整。
+     *
      * When the instance registry starts up empty, it builds over time when the
      * clients start to send heartbeats and the server requests the clients for
      * registration information.
+     *
+     * 当实例注册表启动为空时，当客户端开始发送心跳，服务器请求客户端提供注册信息时，它会随着时间的推移而构建。
      *
      * @return time in milliseconds.
      */
@@ -229,7 +242,7 @@ public interface EurekaServerConfig {
     /**
      * Gets the timeout value for connecting to peer eureka nodes for
      * replication.
-     *
+     * 获取连接到同等 eureka 节点复制的超时时间。
      * @return timeout value in milliseconds.
      */
     int getPeerNodeConnectTimeoutMs();
@@ -237,6 +250,8 @@ public interface EurekaServerConfig {
     /**
      * Gets the timeout value for reading information from peer eureka nodes for
      * replication.
+     *
+     * 获取从对等eureka节点读取复制信息的超时值。
      *
      * @return timeout value in milliseconds.
      */
@@ -271,6 +286,8 @@ public interface EurekaServerConfig {
      * Get the time for which the delta information should be cached for the
      * clients to retrieve the value without missing it.
      *
+     * 获取应该缓存增量信息的时间，以便客户端在不丢失值的情况下检索该值
+     *
      * @return time in milliseconds
      */
     long getRetentionTimeInMSInDeltaQueue();
@@ -279,6 +296,8 @@ public interface EurekaServerConfig {
      * Get the time interval with which the clean up task should wake up and
      * check for expired delta information.
      *
+     * 获取清理任务应唤醒并检查过期增量信息的时间间隔
+     *
      * @return time in milliseconds.
      */
     long getDeltaRetentionTimerIntervalInMs();
@@ -286,6 +305,8 @@ public interface EurekaServerConfig {
     /**
      * Get the time interval with which the task that expires instances should
      * wake up and run.
+     *
+     * 获取过期实例的任务应该唤醒并运行的时间间隔。
      *
      * @return time in milliseconds.
      */

@@ -26,9 +26,14 @@ import com.google.inject.ImplementedBy;
  * the most common way of doing it or by other means to get the information
  * necessary to talk to other instances registered with <em>Eureka</em>.
  *
+ * 向Eureka server 注册时服务实例所需的配置信息。
+ * 注册后，用户可以根据虚拟主机名（也称为VIPAddress）从EurekaClient中查找信息，
+ * 这是最常见的方法，也可以通过其他方式获取与注册到Eureka的其他实例进行对话所需的信息。
  * <P>
  * As requirements of registration, an id and an appname must be supplied. The id should be
  * unique within the scope of the appname.
+ *
+ * 作为注册要求，必须提供id和appname。id在appname的范围内应该是唯一的。
  * </P>
  *
  * <p>
@@ -44,6 +49,7 @@ public interface EurekaInstanceConfig {
 
     /**
      * Get the unique Id (within the scope of the appName) of this instance to be registered with eureka.
+     * 获取要向eureka注册的此实例的唯一Id（在appName的范围内）。
      *
      * @return the (appname scoped) unique id for this instance
      */
@@ -67,6 +73,7 @@ public interface EurekaInstanceConfig {
      * Indicates whether the instance should be enabled for taking traffic as
      * soon as it is registered with eureka. Sometimes the application might
      * need to do some pre-processing before it is ready to take traffic.
+     * 指示实例在eureka注册后是否应立即启用以获取流量。有时应用可能在准备通信时，需要做一些预处理的操作。
      *
      * :( public API typos are the worst. I think this was meant to be "OnInit".
      *
@@ -109,8 +116,8 @@ public interface EurekaInstanceConfig {
 
     /**
      * 租约续约频率，单位：秒。应用不断通过按照该频率发送心跳给Eureka-Server以达到续约的作用。
-     * 当Eureka-Server超过最大时间未收到续约（心跳），此时，将客户端移除，其他应用无法从
-     * Eureka-Server获取该应用。
+     * 当Eureka-Server超过续约最大有效期未收到续约（心跳），此时，就把 client 移除，其他应用无法从
+     * Eureka-Server获取该服务应用了。
      *
      * Indicates how often (in seconds) the eureka client needs to send
      * heartbeats to eureka server to indicate that it is still alive. If the
@@ -132,6 +139,7 @@ public interface EurekaInstanceConfig {
      * Indicates the time in seconds that the eureka server waits since it
      * received the last heartbeat before it can remove this instance from its
      * view and there by disallowing traffic to this instance.
+     * 指示eureka-server 自接收到最后一个心跳信号后等待的时间（以秒为单位），然后才能从其视图中删除此实例，并通过禁止此实例的通信量来删除此实例
      *
      * <p>
      * Setting this value too long could mean that the traffic could be routed
@@ -139,7 +147,8 @@ public interface EurekaInstanceConfig {
      * too small could mean, the instance may be taken out of traffic because of
      * temporary network glitches.This value to be set to atleast higher than
      * the value specified in {@link #getLeaseRenewalIntervalInSeconds()}
-     * .
+     * 如果这个契约过期时间设置太长就有可能eureka-server会把请求路由到这个已经不存活的节点上。
+     * 如果设置太短，就有可能eureka-server会因为网络抖动，在有效期内收不到续约心跳，从而移除这个节点。
      * </p>
      *
      * @return value indicating time in seconds.

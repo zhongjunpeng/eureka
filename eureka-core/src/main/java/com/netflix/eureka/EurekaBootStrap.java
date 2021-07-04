@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The class that kick starts the eureka server.
+ * 启动eureka服务器的类
  *
  * <p>
  * The eureka server is configured by using the configuration
@@ -60,6 +61,8 @@ import org.slf4j.LoggerFactory;
  * <em>eureka.client.props</em>. If the server runs in the AWS cloud, the eureka
  * server binds it to the elastic ip as specified.
  * </p>
+ * eureka server 是通过使用类路径中 eureka.server.props 指定的配置 EurekaServerConfig 来配置的。
+ * 如果 server 运行在 AWS 云上，那 eureka server 绑定指定的ip
  *
  * @author Karthik Ranganathan, Greg Kim, David Liu
  *
@@ -163,15 +166,17 @@ public class EurekaBootStrap implements ServletContextListener {
 
         // 初始化eureka-server内部的一个eureka-client（用来跟eureka-server 集群内其他节点做注册和通信）
         if (eurekaClient == null) {
+            // 先判断是否云实力配置，否则创建数据中心实例配置，MyDataCenterInstanceConfig 会去加载 eureka-client.properties 配置文件
             EurekaInstanceConfig instanceConfig = isCloud(ConfigurationManager.getDeploymentContext())
                     ? new CloudInstanceConfig()
                     : new MyDataCenterInstanceConfig();
-            
+            // 创建租约信息
             applicationInfoManager = new ApplicationInfoManager(
                     instanceConfig, new EurekaConfigBasedInstanceInfoProvider(instanceConfig).get());
-            
+
+            // 读取 eureka-client 的配置文件
             EurekaClientConfig eurekaClientConfig = new DefaultEurekaClientConfig();
-            eurekaClient = new DiscoveryClient(applicationInfoManager, eurekaClientConfig);
+            eurekaClient = new DiscoveryClient(applicationInfoManager, eurekaClientConfig); // 创建用于与Eureka服务器进行交互的类。
         } else {
             applicationInfoManager = eurekaClient.getApplicationInfoManager();
         }

@@ -22,7 +22,7 @@ import javax.inject.Singleton;
 
 /**
  * An {@link InstanceInfo} configuration for the non-AWS datacenter.
- *
+ * 作为一个非 AWS 实例配置的数据中心
  * @author Karthik Ranganathan
  *
  */

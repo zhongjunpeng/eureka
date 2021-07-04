@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
  * The <code>PeerEurekaNode</code> represents a peer node to which information
  * should be shared from this node.
  *
+ * PeerEurekaNode表示从该节点共享信息的对等节点。
+ *
  * <p>
  * This class handles replicating all update operations like
  * <em>Register,Renew,Cancel,Expiration and Status Changes</em> to the eureka

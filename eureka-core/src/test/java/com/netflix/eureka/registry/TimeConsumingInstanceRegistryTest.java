@@ -154,7 +154,7 @@ public class TimeConsumingInstanceRegistryTest extends AbstractTester {
                         Preconditions.checkState(registry.getApplication(LOCAL_REGION_APP_NAME).getInstances().size() == 45,
                                 "There should be 45 instances in application - MYLOCAPP");
                     } catch (Exception e) {
-                        logger.error(e.getMessage(),e.getStackTrace());
+                        logger.error(e.getMessage(),e.getStackTrace().toString());
                     }
                 }
             })

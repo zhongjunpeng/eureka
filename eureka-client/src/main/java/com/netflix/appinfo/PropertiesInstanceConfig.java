@@ -38,6 +38,8 @@ import static com.netflix.appinfo.PropertyBasedInstanceConfigConstants.*;
  * <em>eureka-client.properties</em> is assumed as the default.The properties
  * that are looked up uses the <em>namespace</em> passed on to this class.
  * </p>
+ * 配置文件提供了注册eureka服务器所需的信息，在类路径中搜索配置文件，其名称由属性eureka.client.props指定，后缀为.properties
+ * 如果未指定属性，那么 eureka-client.properties 就做为默认的配置文件。
  *
  * <p>
  * If the <em>eureka.environment</em> property is specified, additionally

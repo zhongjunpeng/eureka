@@ -89,6 +89,7 @@ import com.netflix.servo.monitor.Stopwatch;
 
 /**
  * The class that is instrumental for interactions with <tt>Eureka Server</tt>.
+ * DiscoveryClient 用于与Eureka服务器进行交互的类。
  *
  * <p>
  * <tt>Eureka Client</tt> is responsible for a) <em>Registering</em> the
@@ -282,7 +283,7 @@ public class DiscoveryClient implements EurekaClient {
     public DiscoveryClient(ApplicationInfoManager applicationInfoManager, final EurekaClientConfig config, AbstractDiscoveryClientOptionalArgs args, EndpointRandomizer randomizer) {
         this(applicationInfoManager, config, args, new Provider<BackupRegistry>() {
             private volatile BackupRegistry backupRegistryInstance;
-
+            // 匿名内部类
             @Override
             public synchronized BackupRegistry get() {
                 if (backupRegistryInstance == null) {
@@ -309,6 +310,14 @@ public class DiscoveryClient implements EurekaClient {
                 return backupRegistryInstance;
             }
         }, randomizer);
+    }
+
+    private void test(Provider<BackupRegistry> backupRegistryProvider){
+
+    }
+
+    private void test2(){
+        test(() -> null);
     }
 
     /**
@@ -358,14 +367,14 @@ public class DiscoveryClient implements EurekaClient {
         remoteRegionsToFetch = new AtomicReference<String>(clientConfig.fetchRegistryForRemoteRegions());
         remoteRegionsRef = new AtomicReference<>(remoteRegionsToFetch.get() == null ? null : remoteRegionsToFetch.get().split(","));
 
-        // 判断eureka-server配置中是否配置了eureka.client.fetchRegistry,默认在单机下是为false，表示不需要从其他eureka-server拉取注册信息中。
+        // 判断eureka-server配置中是否配置了eureka.client.fetchRegistry,在单机下需设置为false，表示不需要从其他eureka-server拉取注册信息中。
         if (config.shouldFetchRegistry()) {
             this.registryStalenessMonitor = new ThresholdLevelsMetric(this, METRIC_REGISTRY_PREFIX + "lastUpdateSec_", new long[]{15L, 30L, 60L, 120L, 240L, 480L});
         } else {
             this.registryStalenessMonitor = ThresholdLevelsMetric.NO_OP_METRIC;
         }
 
-        // 判断eureka-server配置中是否配置eureka.client.registerWithEureka，默认在单机下为false。表示自己不需要向其他注册中心注册自己。
+        // 判断eureka-server配置中是否配置eureka.client.registerWithEureka，在单机下需设置为false。表示自己不需要向其他注册中心注册自己。
         if (config.shouldRegisterWithEureka()) {
             this.heartbeatStalenessMonitor = new ThresholdLevelsMetric(this, METRIC_REGISTRATION_PREFIX + "lastHeartbeatSec_", new long[]{15L, 30L, 60L, 120L, 240L, 480L});
         } else {
@@ -374,6 +383,7 @@ public class DiscoveryClient implements EurekaClient {
 
         logger.info("Initializing Eureka in region {}", clientConfig.getRegion());
 
+        // 不需要注册到eureka server ，也不需要到 eureka server 拉取注册信息
         if (!config.shouldRegisterWithEureka() && !config.shouldFetchRegistry()) {
             logger.info("Client configured to neither register nor query for data.");
             scheduler = null;
@@ -415,7 +425,7 @@ public class DiscoveryClient implements EurekaClient {
                             .build()
             );  // use direct handoff
 
-            //创建一个缓存刷新线程池
+            //创建一个缓存刷新线程池，用于更新本地服务注册信息
             cacheRefreshExecutor = new ThreadPoolExecutor(
                     1, clientConfig.getCacheRefreshExecutorThreadPoolSize(), 0, TimeUnit.SECONDS,
                     new SynchronousQueue<Runnable>(),
@@ -425,7 +435,9 @@ public class DiscoveryClient implements EurekaClient {
                             .build()
             );  // use direct handoff
 
+            // 创建用于 eureka client 和 eureka server 进行通信的组件对象
             eurekaTransport = new EurekaTransport();
+            // 对通信组件进行初始化
             scheduleServerEndpointTask(eurekaTransport, args);
 
             AzToRegionMapper azToRegionMapper;
@@ -462,7 +474,7 @@ public class DiscoveryClient implements EurekaClient {
                 throw new IllegalStateException(th);
             }
         }
-        //如果是eureka server的话，我们在玩儿spring cloud的时候，会将这个fetchRegistry给手动设置为false，
+        //如果是eureka server 单实例的话，我们在玩儿spring cloud的时候，会将这个fetchRegistry给手动设置为false，
         // 如果是eureka server集群的话，就还是要保持为true。registerWithEureka也要设置为true。
         //
         //（1）读取EurekaClientConfig，包括TransportConfig
@@ -475,7 +487,7 @@ public class DiscoveryClient implements EurekaClient {
         //（8）如果要抓取注册表的话，在这里就会去抓取注册表了，但是如果说你配置了不抓取，那么这里就不抓取了
         //（9）初始化调度任务：如果要抓取注册表的话，就会注册一个定时任务，按照你设定的那个抓取的间隔，每隔一定时间（默认是30s），
         // 去执行一个CacheRefreshThread，给放那个调度线程池里去了；如果要向eureka server进行注册的话，会搞一个定时任务，
-        // 每隔一定时间发送心跳，执行一个HeartbeatThread；创建了服务实例副本传播器，将自己作为一个定时任务进行调度；
+        // 每隔一定时间发送心跳，默认是30s，执行一个HeartbeatThread；创建了服务实例副本传播器，将自己作为一个定时任务进行调度；
         // 创建了服务实例的状态变更的监听器，如果你配置了监听，那么就会注册监听器
 
         // // 初始化调度任务
@@ -559,6 +571,7 @@ public class DiscoveryClient implements EurekaClient {
                 endpointRandomizer
         );
 
+        // 如果设置需要到 Eureka server 注册，那就会创建 EurekaHttpClient 对象
         if (clientConfig.shouldRegisterWithEureka()) {
             EurekaHttpClientFactory newRegistrationClientFactory = null;
             EurekaHttpClient newRegistrationClient = null;
@@ -578,6 +591,7 @@ public class DiscoveryClient implements EurekaClient {
 
         // new method (resolve from primary servers for read)
         // Configure new transport layer (candidate for injecting in the future)
+        // 需要拉取注册信息
         if (clientConfig.shouldFetchRegistry()) {
             EurekaHttpClientFactory newQueryClientFactory = null;
             EurekaHttpClient newQueryClient = null;
@@ -997,10 +1011,13 @@ public class DiscoveryClient implements EurekaClient {
     /**
      * Fetches the registry information.
      *
+     * 拉取注册信息
+     *
      * <p>
      * This method tries to get only deltas after the first fetch unless there
      * is an issue in reconciling eureka server and client registry information.
      * </p>
+     * 除非在同步 eureka server 和 client 之间注册表信息时出现问题，否则此方法仅尝试在第一次全量获取，其余都是获取增量数据。
      *
      * @param forceFullRegistryFetch Forces a full registry fetch.
      *
@@ -1014,9 +1031,10 @@ public class DiscoveryClient implements EurekaClient {
             // applications
             Applications applications = getApplications();
 
+            // 判断是否关闭增量拉取
             if (clientConfig.shouldDisableDelta()
                     || (!Strings.isNullOrEmpty(clientConfig.getRegistryRefreshSingleVipAddress()))
-                    || forceFullRegistryFetch
+                    || forceFullRegistryFetch // 强制全量拉取
                     || (applications == null)
                     || (applications.getRegisteredApplications().size() == 0)
                     || (applications.getVersion() == -1)) //Client application does not have latest library supporting delta
@@ -1098,6 +1116,9 @@ public class DiscoveryClient implements EurekaClient {
     /**
      * Gets the full registry information from the eureka server and stores it locally.
      * When applying the full registry, the following flow is observed:
+     *
+     * 从 eureka server 拉取全量注册信息并且把注册信息缓存在本地。
+     * 当应用全量注册信息，
      *
      * if (update generation have not advanced (due to another thread))
      *   atomically set the registry to the new registry
